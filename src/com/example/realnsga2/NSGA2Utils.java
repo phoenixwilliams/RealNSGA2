@@ -170,11 +170,11 @@ public final class NSGA2Utils {
             ri = random.nextDouble();
             if (mi < mutProb && ri < 0.5)
             {
-                di = Math.pow(2.0*ri, 1/(nm+1))-1.0;
+                di = Math.pow(2.0*ri, 1.0/(nm+1.0))-1.0;
             }
             else if(mi < mutProb && ri >= 0.5)
             {
-                di = 1.0 - Math.pow(2.0*(1-ri), 1/(nm+1));
+                di = 1.0 - Math.pow(2.0*(1-ri), 1.0/(nm+1.0));
             }
             else{
                 di = 0.0;
