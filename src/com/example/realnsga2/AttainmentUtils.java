@@ -51,5 +51,40 @@ public final class AttainmentUtils {
         }
         return attainedPopulation;
     }
+
+    public static Double IGD(ArrayList<ArrayList<Double>> paretoPoints, ArrayList<ArrayList<Double>> population)
+    {
+        Double closestDist;
+        Double dist = 0.0;
+        Double tempDist;
+
+        for (int i=0; i<paretoPoints.size();i++)
+        {
+            closestDist = Double.POSITIVE_INFINITY;
+
+            for (int j=0;j<population.size();j++)
+            {
+                tempDist = euclideanDist(paretoPoints.get(i), population.get(j));
+                if (tempDist<closestDist)
+                {
+                    closestDist = tempDist;
+                }
+            }
+            dist+=closestDist;
+        }
+        return dist/paretoPoints.size();
+    }
+
+    public static Double euclideanDist(ArrayList<Double> a, ArrayList<Double> b)
+    {
+        Double difference = 0.0;
+
+        for (int i=0;i<a.size();i++)
+        {
+            difference += Math.pow(a.get(i)-b.get(i), 2);
+        }
+        return Math.sqrt(difference);
+
+    }
 }
 

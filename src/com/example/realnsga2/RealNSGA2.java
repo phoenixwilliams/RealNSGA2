@@ -93,13 +93,13 @@ public class RealNSGA2 {
        for (int i=0;i<iterations;i++)
        {
            //System.out.println(Integer.toString(i));
-           NSGA2Utils.EvaluatePopulationZDT2(population);
+           NSGA2Utils.EvaluatePopulationZDT1(population);
            NSGA2Utils.SetPopulationCrowdingDistance(population, ProblemUtils.ZDTObjectives());
            childPopulation = generateChildPopulation(population, matingPoolSize,mutationProbability,
                                                            reproductionProbability, nc, nm,lowerBounds,upperBounds);
 
 
-            NSGA2Utils.EvaluatePopulationZDT2(childPopulation);
+            NSGA2Utils.EvaluatePopulationZDT1(childPopulation);
             NSGA2Utils.SetPopulationCrowdingDistance(childPopulation, ProblemUtils.ZDTObjectives());
 
             population.addAll(childPopulation);
@@ -112,13 +112,12 @@ public class RealNSGA2 {
         long endTime = System.currentTimeMillis();
         float duration = (endTime - startTime)/1000F;
 
-        NSGA2Utils.EvaluatePopulationZDT2(population);
+        NSGA2Utils.EvaluatePopulationZDT1(population);
         ArrayList<Solution> non_dominated_front = new ArrayList<>();
         ArrayList<ArrayList<Double>> non_dominated_points = new ArrayList<>();
         int domCount;
 
         Collections.sort(population, new SolutionFitnessComparator(1));
-
 
 
         for (int i=population.size()-1; i>0; i--) {
@@ -128,15 +127,15 @@ public class RealNSGA2 {
                 non_dominated_front.add(population.get(i));
                 non_dominated_points.add(population.get(i).getFitness());
             }
-            System.out.println(Arrays.toString(population.get(i).getFitness().toArray()));
+            //System.out.println(Arrays.toString(population.get(i).getFitness().toArray()));
             //System.out.println(Arrays.toString(population.get(i).getGenotype().toArray()));
         }
 
         System.out.println("non-dominated set size:" + Integer.toString(non_dominated_front.size())+" process took:"+Float.toString(duration)+"seconds");
         AnalysisUtils.generateDatFile(non_dominated_front, "non-dominated-pop");
 
-        ArrayList<ArrayList<Double>> no_duplicates_non_dominated_points = new ArrayList<>();
-
+        /**
+         ArrayList<ArrayList<Double>> no_duplicates_non_dominated_points = new ArrayList<>();
         for (ArrayList<Double> point: non_dominated_points)
         {
             if (!no_duplicates_non_dominated_points.contains(point));
@@ -144,34 +143,25 @@ public class RealNSGA2 {
                 no_duplicates_non_dominated_points.add(point);
             }
         }
-
-        ArrayList<Double> worstPoint = new ArrayList<>();
-
-        for (int i=0;i<variableNumber;i++)
-        {
-            worstPoint.add(1.0);
-        }
-
-        worstPoint = ProblemUtils.ZDT2(worstPoint);
-        //System.out.println("worst point:"+Arrays.toString(worstPoint.toArray()));
-
-
-        Double hypervolume = AttainmentUtils.computeHypervolume(no_duplicates_non_dominated_points,
-                worstPoint);
-
-
-
+        ArrayList<Double> worstPoint = new ArrayList<>(Arrays.asList(1.0,12.0));
+        Double hypervolume = AttainmentUtils.computeHypervolume(no_duplicates_non_dominated_points,worstPoint);
         System.out.println("Hypervolume: "+Double.toString(hypervolume)+" using worst point:"+Arrays.toString(worstPoint.toArray()));
+        */
+
+        //Calculate IGD
+        ArrayList<Solution> paretoFrontSolutions = NSGA2Utils.InitialPopulation(2, 100000);
+        NSGA2Utils.EvaluatePopulationParetoZDT1(paretoFrontSolutions);
+        AnalysisUtils.generateDatFile(paretoFrontSolutions, "pareto-front");
+        ArrayList<ArrayList<Double>> paretoFrontPoints = AnalysisUtils.getFitnessPoints(paretoFrontSolutions);
+        Double IDG = AttainmentUtils.IGD(paretoFrontPoints, non_dominated_points);
+        System.out.println("IGD: "+Double.toString(IDG));
+
 
     }
 
     public static void main(String[] args)
     {
         nsga2();
-        //ArrayList<Solution> pop = NSGA2Utils.InitialPopulation(2, 100000);
-        //NSGA2Utils.EvaluatePopulationZDT2(pop);
-        //AnalysisUtils.generateDatFile(pop, "objective_space");
-
 
     }
 

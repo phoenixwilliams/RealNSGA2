@@ -35,12 +35,26 @@ public final class NSGA2Utils {
             sol.setFitness(ProblemUtils.ZDT1(sol.getGenotype()));
         }
     }
+    public static void EvaluatePopulationParetoZDT1(ArrayList<Solution> population)
+    {
+        for (Solution sol:population)
+        {
+            sol.setFitness(ProblemUtils.paretoZDT1(sol.getGenotype()));
+        }
+    }
 
     public static void EvaluatePopulationZDT2(ArrayList<Solution> population)
     {
         for (Solution sol:population)
         {
             sol.setFitness(ProblemUtils.ZDT2(sol.getGenotype()));
+        }
+    }
+    public static void EvaluatePopulationParetoZDT2(ArrayList<Solution> population)
+    {
+        for (Solution sol:population)
+        {
+            sol.setFitness(ProblemUtils.paretoZDT2(sol.getGenotype()));
         }
     }
     public static void EvaluatePopulationZDT3(ArrayList<Solution> population)
@@ -50,6 +64,13 @@ public final class NSGA2Utils {
             sol.setFitness(ProblemUtils.ZDT3(sol.getGenotype()));
         }
     }
+    public static void EvaluatePopulationParetoZDT3(ArrayList<Solution> population)
+    {
+        for (Solution sol:population)
+        {
+            sol.setFitness(ProblemUtils.paretoZDT3(sol.getGenotype()));
+        }
+    }
     public static void EvaluatePopulationZDT4(ArrayList<Solution> population)
     {
         for (Solution sol:population)
@@ -57,11 +78,25 @@ public final class NSGA2Utils {
             sol.setFitness(ProblemUtils.ZDT4(sol.getGenotype()));
         }
     }
+    public static void EvaluatePopulationParetoZDT4(ArrayList<Solution> population)
+    {
+        for (Solution sol:population)
+        {
+            sol.setFitness(ProblemUtils.paretoZDT4(sol.getGenotype()));
+        }
+    }
     public static void EvaluatePopulationZDT6(ArrayList<Solution> population)
     {
         for (Solution sol:population)
         {
-            sol.setFitness(ProblemUtils.ZDT3(sol.getGenotype()));
+            sol.setFitness(ProblemUtils.ZDT6(sol.getGenotype()));
+        }
+    }
+    public static void EvaluatePopulationParetoZDT6(ArrayList<Solution> population)
+    {
+        for (Solution sol:population)
+        {
+            sol.setFitness(ProblemUtils.paretoZDT6(sol.getGenotype()));
         }
     }
 
