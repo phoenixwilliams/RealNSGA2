@@ -3,6 +3,7 @@ package com.example.realnsga2;
 import java.nio.file.Watchable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 public class RealNSGA2 {
@@ -42,10 +43,10 @@ public class RealNSGA2 {
                 parent1 = matingPool.get(random.nextInt(matingPoolSize));
                 parent2 = matingPool.get(random.nextInt(matingPoolSize));
 
-                while(parent2.getGenotype().equals(parent1.getGenotype()))
-                {
-                    parent2 = matingPool.get(random.nextInt(matingPoolSize));
-                }
+               //while(parent2.getGenotype().equals(parent1.getGenotype()))
+               //{
+               //    parent2 = matingPool.get(random.nextInt(matingPoolSize));
+               //}
 
                 offspringGenotypes = NSGA2Utils.SBXCrossover(parent1.getGenotype(), parent2.getGenotype(), nc,
                                                                 lowerBounds, upperBounds);
@@ -68,14 +69,14 @@ public class RealNSGA2 {
     public static void nsga2()
     {
         int variableNumber = 30;
-        int populationSize = 100;
+        int populationSize = 1000;
         int iterations = 100;
-        int matingPoolSize = 50;
+        int matingPoolSize = 500;
         double mutationProbability = 1/variableNumber;
         double reproductionProbability = 0.1;
 
-        int nc = 20;
-        int nm = 20;
+        int nc = 15;
+        int nm = 15;
         ArrayList<Double> lowerBounds = new ArrayList<>();
         ArrayList<Double> upperBounds = new ArrayList<>();
 
@@ -91,14 +92,14 @@ public class RealNSGA2 {
 
        for (int i=0;i<iterations;i++)
        {
-           NSGA2Utils.EvaluatePopulationZDT1(population);
+           //System.out.println(Integer.toString(i));
+           NSGA2Utils.EvaluatePopulationZDT2(population);
            NSGA2Utils.SetPopulationCrowdingDistance(population, ProblemUtils.ZDTObjectives());
            childPopulation = generateChildPopulation(population, matingPoolSize,mutationProbability,
                                                            reproductionProbability, nc, nm,lowerBounds,upperBounds);
 
 
-
-            NSGA2Utils.EvaluatePopulationZDT1(childPopulation);
+            NSGA2Utils.EvaluatePopulationZDT2(childPopulation);
             NSGA2Utils.SetPopulationCrowdingDistance(childPopulation, ProblemUtils.ZDTObjectives());
 
             population.addAll(childPopulation);
@@ -111,26 +112,38 @@ public class RealNSGA2 {
         long endTime = System.currentTimeMillis();
         float duration = (endTime - startTime)/1000F;
 
-        NSGA2Utils.EvaluatePopulationZDT1(population);
+        NSGA2Utils.EvaluatePopulationZDT2(population);
         ArrayList<Solution> non_dominated_front = new ArrayList<>();
         ArrayList<ArrayList<Double>> non_dominated_points = new ArrayList<>();
         int domCount;
 
+        Collections.sort(population, new SolutionFitnessComparator(1));
 
 
-        for (int i=0; i<population.size(); i++) {
+
+        for (int i=population.size()-1; i>0; i--) {
             domCount = NSGA2Utils.GetDominatedCount(i, population);
             if (domCount==0)
             {
                 non_dominated_front.add(population.get(i));
-                non_dominated_points.add(population.get(i).getGenotype());
+                non_dominated_points.add(population.get(i).getFitness());
             }
             System.out.println(Arrays.toString(population.get(i).getFitness().toArray()));
-            System.out.println(Arrays.toString(population.get(i).getGenotype().toArray()));
+            //System.out.println(Arrays.toString(population.get(i).getGenotype().toArray()));
         }
 
         System.out.println("non-dominated set size:" + Integer.toString(non_dominated_front.size())+" process took:"+Float.toString(duration)+"seconds");
-        AnalysisUtils.generateDatFileRealSol(non_dominated_front, "non-dominated-pop");
+        AnalysisUtils.generateDatFile(non_dominated_front, "non-dominated-pop");
+
+        ArrayList<ArrayList<Double>> no_duplicates_non_dominated_points = new ArrayList<>();
+
+        for (ArrayList<Double> point: non_dominated_points)
+        {
+            if (!no_duplicates_non_dominated_points.contains(point));
+            {
+                no_duplicates_non_dominated_points.add(point);
+            }
+        }
 
         ArrayList<Double> worstPoint = new ArrayList<>();
 
@@ -139,21 +152,25 @@ public class RealNSGA2 {
             worstPoint.add(1.0);
         }
 
-        Double hypervolume = AttainmentUtils.computeHypervolume(non_dominated_points,
-                new ArrayList<>(ProblemUtils.ZDT1(worstPoint)));
+        worstPoint = ProblemUtils.ZDT2(worstPoint);
+        //System.out.println("worst point:"+Arrays.toString(worstPoint.toArray()));
 
-        System.out.println("Hypervolume: "+Double.toString(hypervolume));
+
+        Double hypervolume = AttainmentUtils.computeHypervolume(no_duplicates_non_dominated_points,
+                worstPoint);
+
+
+
+        System.out.println("Hypervolume: "+Double.toString(hypervolume)+" using worst point:"+Arrays.toString(worstPoint.toArray()));
 
     }
 
     public static void main(String[] args)
     {
         nsga2();
-
-
-
-        //NSGA2Utils.EvaluatePopulationZDT1(pop);
-        //AnalysisUtils.generateDatFileRealSol(pop, "objective_space");
+        //ArrayList<Solution> pop = NSGA2Utils.InitialPopulation(2, 100000);
+        //NSGA2Utils.EvaluatePopulationZDT2(pop);
+        //AnalysisUtils.generateDatFile(pop, "objective_space");
 
 
     }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public final class AnalysisUtils {
 
-    public static void generateDatFileRealSol(ArrayList<Solution> population, String filename)
+    public static void generateDatFile(ArrayList<Solution> population, String filename)
     {
         try{
             FileWriter myWriter = new FileWriter(filename+".dat");

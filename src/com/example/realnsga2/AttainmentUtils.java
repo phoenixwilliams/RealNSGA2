@@ -1,11 +1,13 @@
 package com.example.realnsga2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public final class AttainmentUtils {
 
     public static Double computeHypervolume(ArrayList<ArrayList<Double>> nonDominatedSet, ArrayList<Double> w)
     {
+       // System.out.println("w:"+Arrays.toString(w.toArray()));
         double tempY = w.get(1);
         double hypervolume = 0.0;
         double tempWidth, tempLength =0.0;
@@ -14,6 +16,7 @@ public final class AttainmentUtils {
         {
 
             if (i==0 || (i>0 && !nonDominatedSet.get(i).equals(nonDominatedSet.get(i-1)))) {
+                //System.out.println(Double.toString(tempY)+":"+ Arrays.toString(w.toArray()));
                 tempLength = w.get(0) - nonDominatedSet.get(i).get(0);
                 tempWidth = tempY - nonDominatedSet.get(i).get(1);
 
