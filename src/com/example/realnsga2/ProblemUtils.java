@@ -100,7 +100,7 @@ public final class ProblemUtils {
         double sum =0;
         for (int i=1; i<decisionVariables.size(); i++)
         {
-            sum += (Math.pow(decisionVariables.get(i),2.0) - 10.0*Math.cos(4*Math.PI*decisionVariables.get(i)));
+            sum += (Math.pow(decisionVariables.get(i),2.0) - 10.0*Math.cos(4.0*Math.PI*decisionVariables.get(i)));
         }
         double g = 1.0 + 10.0*(decisionVariables.size()-1)+sum;
         double h = 1.0 - Math.sqrt(f1/g);
@@ -114,7 +114,7 @@ public final class ProblemUtils {
         double sum =0;
         for (int i=1; i<decisionVariables.size(); i++)
         {
-            sum += (Math.pow(decisionVariables.get(i),2.0) - 10.0*Math.cos(4*Math.PI*decisionVariables.get(i)));
+            sum += (Math.pow(decisionVariables.get(i),2.0) - 10.0*Math.cos(4.0*Math.PI*decisionVariables.get(i)));
         }
         double g = 1.0;
         double h = 1.0 - Math.sqrt(f1/g);

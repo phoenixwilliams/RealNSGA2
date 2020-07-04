@@ -70,9 +70,10 @@ public final class AttainmentUtils {
                     closestDist = tempDist;
                 }
             }
+            //System.out.println(Double.toString(closestDist));
             dist+=closestDist;
         }
-        return dist/paretoPoints.size();
+        return dist/(double)paretoPoints.size();
     }
 
     public static Double euclideanDist(ArrayList<Double> a, ArrayList<Double> b)
@@ -83,6 +84,7 @@ public final class AttainmentUtils {
         {
             difference += Math.pow(a.get(i)-b.get(i), 2);
         }
+        //System.out.println(Double.toString(Math.sqrt(difference)));
         return Math.sqrt(difference);
 
     }
