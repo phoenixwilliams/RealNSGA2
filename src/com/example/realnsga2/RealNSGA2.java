@@ -70,13 +70,13 @@ public class RealNSGA2 {
     {
         int variableNumber = 10;
         int populationSize = 100;
-        int iterations = 100;
+        int iterations = 5000;
         int matingPoolSize = 50;
         double mutationProbability = 1/variableNumber;
         double reproductionProbability = 0.1;
 
         int nc = 20;
-        int nm = 15;
+        int nm = 20;
         ArrayList<Double> lowerBounds = new ArrayList<>();
         ArrayList<Double> upperBounds = new ArrayList<>();
 
@@ -93,13 +93,13 @@ public class RealNSGA2 {
        for (int i=0;i<iterations;i++)
        {
            //System.out.println(Integer.toString(i));
-           NSGA2Utils.EvaluatePopulationZDT4(population);
+           NSGA2Utils.EvaluatePopulationZDT6(population);
            NSGA2Utils.SetPopulationCrowdingDistance(population, ProblemUtils.ZDTObjectives());
            childPopulation = generateChildPopulation(population, matingPoolSize,mutationProbability,
                                                            reproductionProbability, nc, nm,lowerBounds,upperBounds);
 
 
-            NSGA2Utils.EvaluatePopulationZDT4(childPopulation);
+            NSGA2Utils.EvaluatePopulationZDT6(childPopulation);
             NSGA2Utils.SetPopulationCrowdingDistance(childPopulation, ProblemUtils.ZDTObjectives());
 
             population.addAll(childPopulation);
@@ -154,10 +154,11 @@ public class RealNSGA2 {
 
         for (int i=0; i<runs;i++)
         {
+            System.out.println(Integer.toString(i));
             allSolutions.addAll(nsga2());
         }
 
-        NSGA2Utils.EvaluatePopulationZDT4(allSolutions);
+        NSGA2Utils.EvaluatePopulationZDT6(allSolutions);
         for (int i=0; i<allSolutions.size(); i++)
         {
             domCount = NSGA2Utils.GetDominatedCount(i, allSolutions);
@@ -165,17 +166,39 @@ public class RealNSGA2 {
                 nonDominatedSolutions.add(allSolutions.get(i));
             }
         }
-
+        Collections.sort(nonDominatedSolutions, new HypervolumeFitnessComparator(1));
         ArrayList<ArrayList<Double>> non_dominated_points = AnalysisUtils.getFitnessPoints(nonDominatedSolutions);
-        NSGA2Utils.EvaluatePopulationZDT4(nonDominatedSolutions);
+        NSGA2Utils.EvaluatePopulationZDT6(nonDominatedSolutions);
         AnalysisUtils.generateDatFile(nonDominatedSolutions, "non-dominated-pop");
         //Calculate IGD
-        ArrayList<Solution> paretoFrontSolutions = NSGA2Utils.InitialPopulation(10, 1000);
-        NSGA2Utils.EvaluatePopulationParetoZDT4(paretoFrontSolutions);
-        AnalysisUtils.generateDatFile(paretoFrontSolutions, "pareto-front");
-        ArrayList<ArrayList<Double>> paretoFrontPoints = AnalysisUtils.getFitnessPoints(paretoFrontSolutions);
+        ArrayList<Solution> paretoFrontSolutions = NSGA2Utils.InitialPopulation(30, 10000);
+        NSGA2Utils.EvaluatePopulationParetoZDT6(paretoFrontSolutions);
+        ArrayList<Solution> truePF = new ArrayList<>();
+
+        for (int i=0;i<paretoFrontSolutions.size();i++)
+        {
+            domCount = NSGA2Utils.GetDominatedCount(i, paretoFrontSolutions);
+            if (domCount == 0) {
+                //System.out.println(Integer.toString(i));
+                truePF.add(paretoFrontSolutions.get(i));
+            }
+        }
+
+        Collections.sort(truePF, new HypervolumeFitnessComparator(1));
+        AnalysisUtils.generateDatFile(truePF, "pareto-front");
+        ArrayList<ArrayList<Double>> paretoFrontPoints = AnalysisUtils.getFitnessPoints(truePF);
         Double IDG = AttainmentUtils.IGD(paretoFrontPoints, non_dominated_points);
         System.out.println("IGD: "+Double.toString(IDG));
+
+        ArrayList<Double> worstPoint = new ArrayList<>(Arrays.asList(10.0,10.0));
+        Double hypervolume = AttainmentUtils.computeHypervolume(non_dominated_points, worstPoint);
+        System.out.println("Hypervolume: "+Double.toString(hypervolume));
+
+        Double paretoHypervolume = AttainmentUtils.computeHypervolume(paretoFrontPoints, worstPoint);
+        System.out.println("Hypervolume: "+Double.toString(paretoHypervolume));
+
+        System.out.println("Normalised Hypervolume:"+Double.toString(hypervolume/paretoHypervolume));
+
     }
 
 
